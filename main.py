@@ -1,42 +1,51 @@
-import openai
 import re
-import httpx
-import os
-from dotenv import load_dotenv
-# Load environment variables from a .env file
-_ = load_dotenv()
-from openai import OpenAI
-# Initialize the OpenAI client with the API key from environment variables
-client = OpenAI()
-# Create a chat completion using the GPT-3.5-turbo model
-chat_completion = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[{"role": "user", "content": "Hello world"}]
-)
-# Print the content of the first choice from the chat completion response
-chat_completion.choices[0].message.content
-# Define an Agent class to interact with the OpenAI API
-class Agent:
-    def __init__(self, system=""):
-        self.system = system
-        self.messages = []
-        if self.system:
-            #Appelle l’API OpenAI avec tout l’historique
-            self.messages.append({"role": "system", "content": system})
-#rendre l’agent appelable comme une fonction
-    def __call__(self, message):
-        # Ajouter le message de l'utilisateur aux messages
-        self.messages.append({"role": "user", "content": message})
-        # Exécuter l'appel à l'API OpenAI
-        result = self.execute()
-        # Ajouter la réponse de l'assistant aux messages
-        self.messages.append({"role": "assistant", "content": result})
-        return result
-# Méthode pour exécuter l'appel à l'API OpenAI
-    def execute(self):
-        completion = client.chat.completions.create(
-                        model="gpt-4o", 
-                        temperature=0,
-                        messages=self.messages)
-        # Return the content of the first choice from the completion response
-        return completion.choices[0].message.content
+from agents.agent import Agent
+from actions.actions import known_actions, average_dog_weight
+
+# Prompt principal pour l'agent
+prompt = """
+You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop you output an Answer
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
+
+Your available actions are:
+
+calculate:
+e.g. calculate: 4 * 7 / 3
+
+average_dog_weight:
+e.g. average_dog_weight: Collie
+""".strip()
+
+# Expression régulière pour détecter une action
+action_re = re.compile(r'^Action: (\w+): (.*)$')
+
+def query(question, max_turns=5):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i < max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [
+            action_re.match(a) 
+            for a in result.split('\n') 
+            if action_re.match(a)
+        ]
+        if actions:
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception(f"Unknown action: {action}: {action_input}")
+            print(" -- running {} {}".format(action, action_input))
+            observation = known_actions[action](action_input)
+            print("Observation:", observation)
+            next_prompt = f"Observation: {observation}"
+        else:
+            return
+
+# Exemple d’usage
+question = "I have 2 dogs, a Border Collie and a Scottish Terrier. What is their combined weight?"
+query(question)
