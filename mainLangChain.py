@@ -1,10 +1,5 @@
 import os
-from pathlib import Path
 from dotenv import load_dotenv
-from groq import Groq
-from config.config import client
-
-
 
 # 2. Charger ce fichier spécifique
 
