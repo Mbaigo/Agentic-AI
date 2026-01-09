@@ -14,7 +14,6 @@ tavily_key = os.getenv("TAVILY_API_KEY")
 
 from langchain_groq import ChatGroq  # <-- CORRECTION 2 : Import nécessaire pour Groq
 from langchain_core.messages import HumanMessage, AnyMessage, SystemMessage, ToolMessage
-from langchain_community.tools import TavilySearchResults
 from langchain_tavily import TavilySearch
 
 from langgraph.graph import StateGraph,END
