@@ -85,7 +85,7 @@ weather_data = "\n".join(weather_data)
 
 # remove all spaces from the combined text
 weather_data = re.sub(r'\s+', ' ', weather_data)
-    
+# Afficher une partie du contenu extrait
 print(f"Website: {url}\n\n")
 print(weather_data)
 
