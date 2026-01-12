@@ -4,13 +4,14 @@ import os
 # chargement de l'envirpnnement du fichier .env 
 _ = load_dotenv()
 
-tavily_key = os.getenv("TAVILY_API_KEY_ENV")
+tavily_key = os.getenv("TAVILY_API_KEY")
 
+from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, Annotated
 import operator
 from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage, ToolMessage
-from langchain_groq import ChatGroq  # Import nécessaire pour Groq
+#from langchain_groq import ChatGroq  # Import nécessaire pour Groq
 from langchain_tavily import TavilySearch
 
 tool = TavilySearch(max_results=2, tavily_api_key=tavily_key)
@@ -82,18 +83,18 @@ with SqliteSaver.from_conn_string(":memory:") as memory:
                 print(v)
 
 
-#         messages = [HumanMessage(content="Which one is warmer?")]
-#         thread = {"configurable": {"thread_id": "1"}}
-#         for event in abot.graph.stream({"messages": messages}, thread):
-#             for v in event.values():
-#                 print(v)
+        messages = [HumanMessage(content="Which one is warmer?")]
+        thread = {"configurable": {"thread_id": "1"}}
+        for event in abot.graph.stream({"messages": messages}, thread):
+            for v in event.values():
+                print(v)
 
 
-#         messages = [HumanMessage(content="Which one is warmer?")]
-#         thread = {"configurable": {"thread_id": "2"}}
-#         for event in abot.graph.stream({"messages": messages}, thread):
-#             for v in event.values():
-#                 print(v)
+        messages = [HumanMessage(content="Which one is warmer?")]
+        thread = {"configurable": {"thread_id": "2"}}
+        for event in abot.graph.stream({"messages": messages}, thread):
+            for v in event.values():
+                print(v)
 
 # #Streaming token par token
 
